@@ -76,6 +76,7 @@ void verificar_joystick(int16_t x, int16_t y) {
             led_intensity(LED_BLUE,0);
             led_intensity(LED_RED,0);
             printf("Caso -1\n");
+            
             break;
         case 0:
             led_intensity(LED_GREEN,0);
@@ -94,9 +95,7 @@ void verificar_joystick(int16_t x, int16_t y) {
         case 2:
             chuva = true;
             led_intensity(LED_BLUE,intensidade);
-            LOG(intensidade);
-
-            led_intensity(LED_BLUE,0);
+            led_intensity(LED_RED,0);
             led_intensity(LED_GREEN,0);
             printf("Caso 2: Leste\n");
             break; // Leste
@@ -113,7 +112,10 @@ void verificar_joystick(int16_t x, int16_t y) {
             led_intensity(LED_RED,intensidade); 
             led_intensity(LED_GREEN,0); 
             led_intensity(LED_BLUE,0);
-            printf("Caso 4: Sul\n"); 
+            printf("Caso 4: Sul\n");
+            LOG(intensidade);
+            LOG(x);
+            LOG(y); 
             break; // Sul
         case 5:
             sol = true;
@@ -163,5 +165,6 @@ int main()
         int16_t joystick_y = joystick_read(JOYSTICK_Y_PIN, 10, 510);
 
         verificar_joystick(joystick_x, joystick_y);
+        sleep_ms(1000);
     }
 }
