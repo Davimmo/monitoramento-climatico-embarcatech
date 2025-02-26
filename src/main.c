@@ -39,158 +39,123 @@ void print_display(bool sol, bool chuva, bool vento) {
 
 
 void verificar_joystick(int16_t x, int16_t y) {
-    //Intensidade dos leds vária de acordo com o módulo do vetor direção
+    static int ultima_direcao = -1; // Última direção registrada
 
     uint8_t intensidade;
-    int16_t x_absoluto=abs(x);
-    int16_t y_absoluto=abs(y);
-    intensidade = x_absoluto>y_absoluto?x_absoluto:y_absoluto;
-    
+    int16_t x_absoluto = abs(x);
+    int16_t y_absoluto = abs(y);
+    intensidade = x_absoluto > y_absoluto ? x_absoluto : y_absoluto;
+
     bool sol = false, chuva = false, vento = false;
     int direcao = -1;
 
-    if(x>LIMIAR && y_absoluto<=LIMIAR){
-        direcao=2;
-        //Leste
-    }else if (x<-LIMIAR && y_absoluto<=LIMIAR)
-    {   direcao=6;
-        //Oeste
-    }else if (y>LIMIAR && x_absoluto<=LIMIAR)
-    {   direcao=0;
-        //Norte
-    }else if (y<-LIMIAR && x_absoluto<=LIMIAR)
-    {   direcao=4;
-        //Sul
-    }else if (x>=LIMIAR && y>=LIMIAR)
-    {   direcao=1;
-        //Nordeste
-    }else if (x>=LIMIAR && y<=-LIMIAR)
-    {   direcao=3;
-        //Sudeste
-    }else if (x<=-LIMIAR && y<=-LIMIAR)
-    {   direcao=5;
-        //Sudoeste
-    }else if (x<=-LIMIAR && y>=LIMIAR)
-    {   direcao=7;
-        //Noroeste
-    }else if (x_absoluto<LIMIAR && y_absoluto<LIMIAR)
-    {   direcao=-1;
-        //Nada a ser feito
+    // Determina a direção do joystick
+    if (x > LIMIAR && y_absoluto <= LIMIAR)
+        direcao = 2; // Leste
+    else if (x < -LIMIAR && y_absoluto <= LIMIAR)
+        direcao = 6; // Oeste
+    else if (y > LIMIAR && x_absoluto <= LIMIAR)
+        direcao = 0; // Norte
+    else if (y < -LIMIAR && x_absoluto <= LIMIAR)
+        direcao = 4; // Sul
+    else if (x >= LIMIAR && y >= LIMIAR)
+        direcao = 1; // Nordeste
+    else if (x >= LIMIAR && y <= -LIMIAR)
+        direcao = 3; // Sudeste
+    else if (x <= -LIMIAR && y <= -LIMIAR)
+        direcao = 5; // Sudoeste
+    else if (x <= -LIMIAR && y >= LIMIAR)
+        direcao = 7; // Noroeste
+
+    // Se a direção mudou, apaga os LEDs antes de acender os novos
+    if (direcao != ultima_direcao) {
+        npClear();
+        npWrite();
+        led_intensity(LED_GREEN, 0);
+        led_intensity(LED_BLUE, 0);
+        led_intensity(LED_RED, 0);
+        display_clear(&myDisplay);
+        display_update(&myDisplay);
     }
-     
-    
-    //Chuva: vento: green, chuva: blue, sol: red
+
+    // Acende apenas os LEDs da direção atual e atualiza o display
     switch (direcao) {
         case -1:
-            npClear();
-            npWrite();
-            led_intensity(LED_GREEN,0);
-            led_intensity(LED_BLUE,0);
-            led_intensity(LED_RED,0);
-            printf("Caso -1\n");
+            printf("Caso -1: Sem movimento\n");
             display_clear(&myDisplay);
             display_update(&myDisplay);
-            
             break;
         case 0:
-            
-            led_intensity(LED_GREEN,0);
-            led_intensity(LED_BLUE,0);
-            led_intensity(LED_RED,0);
             printf("Caso 0: Norte\n");
-            print_display(sol,chuva,vento);
-            break; // Norte
-            
+            print_display(sol, chuva, vento);
+            break;
         case 1:
             vento = true;
-            led_intensity(LED_GREEN,intensidade);
-
-            led_intensity(LED_RED,0);
-            led_intensity(LED_BLUE,0);
-            printf("Caso 1: Nordeste\n");
-            print_display(sol,chuva,vento);
-
-            npSetLED(12,0,100,0);
-            npWrite();
-            break; // Nordeste
+            led_intensity(LED_GREEN, intensidade);
+            npSetLED(12, 0, 100, 0);
+            print_display(sol, chuva, vento);
+            break;
         case 2:
             chuva = true;
-            led_intensity(LED_BLUE,intensidade);
-            led_intensity(LED_RED,0);
-            led_intensity(LED_GREEN,0);
-            printf("Caso 2: Leste\n");
-            print_display(sol,chuva,vento);
-
-            npSetLED(10,0,0,100);
-            npWrite();
-            break; // Leste
+            led_intensity(LED_BLUE, intensidade);
+            npSetLED(10, 0, 0, 100);
+            print_display(sol, chuva, vento);
+            break;
         case 3:
-            chuva = true; 
+            chuva = true;
             vento = true;
-            led_intensity(LED_GREEN,intensidade); 
-            led_intensity(LED_BLUE,intensidade); 
-            led_intensity(LED_RED,0); 
-            printf("Caso 3: Sudeste\n");
-            print_display(sol,chuva,vento);
-
-            npSetLED(10,0,0,100);
-            npSetLED(12,0,100,0);
-            npWrite();
-            break; // Sudeste
+            led_intensity(LED_GREEN, intensidade);
+            led_intensity(LED_BLUE, intensidade);
+            npSetLED(10, 0, 0, 100);
+            npSetLED(12, 0, 100, 0);
+            print_display(sol, chuva, vento);
+            break;
         case 4:
             sol = true;
-            led_intensity(LED_RED,intensidade); 
-            led_intensity(LED_GREEN,0); 
-            led_intensity(LED_BLUE,0);
-            printf("Caso 4: Sul\n");
-            print_display(sol,chuva,vento);
-
-            npSetLED(14,100,0,0);
-            npWrite();
-            break; // Sul
+            led_intensity(LED_RED, intensidade);
+            npSetLED(14, 100, 0, 0);
+            print_display(sol, chuva, vento);
+            break;
         case 5:
             sol = true;
-            vento = true; 
-            led_intensity(LED_RED,intensidade);
-            led_intensity(LED_GREEN,intensidade);
-            led_intensity(LED_BLUE,0);
-            printf("Caso 5: Sudeste\n");
-            print_display(sol,chuva,vento);
-
-            npSetLED(14,100,0,0);
-            npSetLED(12,0,100,0);
-            npWrite();
-            break; // Sudoeste
+            vento = true;
+            led_intensity(LED_RED, intensidade);
+            led_intensity(LED_GREEN, intensidade);
+            npSetLED(14, 100, 0, 0);
+            npSetLED(12, 0, 100, 0);
+            print_display(sol, chuva, vento);
+            break;
         case 6:
             sol = true;
-            chuva = true; 
-            led_intensity(LED_RED,intensidade);
-            led_intensity(LED_BLUE,intensidade);
-            led_intensity(LED_GREEN,0);
-            printf("Caso 6: Oeste\n");
-            print_display(sol,chuva,vento);
-
-            npSetLED(14,100,0,0);
-            npSetLED(10,0,0,100);
-            npWrite();
-            break; // Oeste
+            chuva = true;
+            led_intensity(LED_RED, intensidade);
+            led_intensity(LED_BLUE, intensidade);
+            npSetLED(14, 100, 0, 0);
+            npSetLED(10, 0, 0, 100);
+            print_display(sol, chuva, vento);
+            break;
         case 7:
-            sol = true; 
-            chuva = true; 
-            vento = true; 
-            led_intensity(LED_GREEN,intensidade);
-            led_intensity(LED_BLUE,intensidade);
-            led_intensity(LED_RED,intensidade);
-            printf("Caso 7: Noroeste \n");
-            print_display(sol,chuva,vento);
-
-            npSetLED(10,0,0,100);
-            npSetLED(12,0,100,0);
-            npSetLED(14,100,0,0);
-            npWrite();
-            break; // Noroeste
+            sol = true;
+            chuva = true;
+            vento = true;
+            led_intensity(LED_GREEN, intensidade);
+            led_intensity(LED_BLUE, intensidade);
+            led_intensity(LED_RED, intensidade);
+            npSetLED(10, 0, 0, 100);
+            npSetLED(12, 0, 100, 0);
+            npSetLED(14, 100, 0, 0);
+            print_display(sol, chuva, vento);
+            break;
     }
+
+    npWrite(); // Atualiza os LEDs
+
+    // Atualiza a última direção
+    ultima_direcao = direcao;
 }
+
+
+
 
 
 int main(){   
