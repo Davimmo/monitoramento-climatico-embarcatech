@@ -2,10 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "hardware/clocks.h"
+#include "hardware/pio.h"
 
 // Bibliotecas da Raspberry Pi Pico
 #include "pico/stdlib.h"
 #include "pico/bootrom.h"
+#include "pio_matrix.pio.h"
+
 
 // Bibliotecas específicas do projeto
 #include "include/joystick.h"
@@ -16,6 +20,36 @@
 #define LOG(var) printf("%s: %d\n", #var, var);
 #define TEMPO_DEBOUNCE 150
 #define LIMIAR 150
+
+#define NUM_PIXELS 25
+#define OUT_PIN 7
+
+//vetor para criar imagem na matriz de led - 1
+double desenho[25] =   {0.0, 0.3, 0.3, 0.3, 0.0,
+    0.0, 0.3, 0.0, 0.3, 0.0, 
+    0.0, 0.3, 0.3, 0.3, 0.0,
+    0.0, 0.3, 0.0, 0.3, 0.0,
+    0.0, 0.3, 0.3, 0.3, 0.0};
+
+uint32_t matrix_rgb(double b, double r, double g)
+{
+  unsigned char R, G, B;
+  R = r * 255;
+  G = g * 255;
+  B = b * 255;
+  return (G << 24) | (R << 16) | (B << 8);
+}
+
+//rotina para acionar a matrix de leds - ws2812b
+//rotina para acionar a matrix de leds - ws2812b
+void desenho_pio(double *desenho, uint32_t valor_led, PIO pio, uint sm, double r, double g, double b){
+
+    for (int16_t i = 0; i < NUM_PIXELS; i++) {
+        
+            valor_led = matrix_rgb(desenho[24-i], r=0.0, g=0.0);
+            pio_sm_put_blocking(pio, sm, valor_led);
+    }
+}
 
 
 display myDisplay;
@@ -162,8 +196,24 @@ void verificar_joystick(int16_t x, int16_t y) {
 }
 
 
-int main()
-{   //Define o botão do joystick como bootsel
+int main(){   
+    PIO pio = pio0; 
+    bool ok;
+    uint16_t i;
+    uint32_t valor_led;
+    double r = 0.0, b = 0.0 , g = 0.0;
+    
+    //coloca a frequência de clock para 128 MHz, facilitando a divisão pelo clock
+    ok = set_sys_clock_khz(128000, false);
+
+    //configurações da PIO
+    uint offset = pio_add_program(pio, &pio_matrix_program);
+    uint sm = pio_claim_unused_sm(pio, true);
+    pio_matrix_program_init(pio, sm, offset, OUT_PIN);
+
+    desenho_pio(desenho,valor_led,pio,sm,r,g,b);
+    
+
     // habilita a entrada no modo BOOTSELL ao pressionar o botao
     // do Joystick da BitDogLab
     init_button_with_interrupt(JOYSTICK_BUTTON, GPIO_IRQ_EDGE_FALL, true);

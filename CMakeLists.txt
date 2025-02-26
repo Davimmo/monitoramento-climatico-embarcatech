@@ -49,6 +49,9 @@ pico_set_program_version(varal "0.1")
 pico_enable_stdio_uart(varal 1)
 pico_enable_stdio_usb(varal 1)
 
+pico_generate_pio_header(varal ${CMAKE_CURRENT_LIST_DIR}/pio_matrix.pio)
+
+
 target_link_libraries(varal
         pico_stdlib)
 
@@ -63,6 +66,7 @@ target_link_libraries(varal
         hardware_pwm
         hardware_i2c
         hardware_adc
+        hardware_pio
         )
 
 pico_add_extra_outputs(varal)
