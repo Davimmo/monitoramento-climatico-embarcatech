@@ -32,33 +32,33 @@ void verificar_joystick(int16_t x, int16_t y) {
     uint8_t intensidade;
     int16_t x_absoluto=abs(x);
     int16_t y_absoluto=abs(y);
-    intensidade = x_absoluto>y_absoluto?x:y;
+    intensidade = x_absoluto>y_absoluto?x_absoluto:y_absoluto;
     
     bool sol = false, chuva = false, vento = false;
     int direcao = -1;
 
-    if(x>LIMIAR && y_absoluto<LIMIAR){
+    if(x>LIMIAR && y_absoluto<=LIMIAR){
         direcao=2;
         //Leste
-    }else if (x<-LIMIAR && y_absoluto<LIMIAR)
+    }else if (x<-LIMIAR && y_absoluto<=LIMIAR)
     {   direcao=6;
         //Oeste
-    }else if (y>LIMIAR && x_absoluto<LIMIAR)
+    }else if (y>LIMIAR && x_absoluto<=LIMIAR)
     {   direcao=0;
         //Norte
-    }else if (y<-LIMIAR && x_absoluto<LIMIAR)
+    }else if (y<-LIMIAR && x_absoluto<=LIMIAR)
     {   direcao=4;
         //Sul
-    }else if (x>LIMIAR && y>LIMIAR)
+    }else if (x>=LIMIAR && y>=LIMIAR)
     {   direcao=1;
         //Nordeste
-    }else if (x>LIMIAR && y<-LIMIAR)
+    }else if (x>=LIMIAR && y<=-LIMIAR)
     {   direcao=3;
         //Sudeste
-    }else if (x<-LIMIAR && y<-LIMIAR)
+    }else if (x<=-LIMIAR && y<=-LIMIAR)
     {   direcao=5;
         //Sudoeste
-    }else if (x<-LIMIAR && y>LIMIAR)
+    }else if (x<=-LIMIAR && y>=LIMIAR)
     {   direcao=7;
         //Noroeste
     }else if (x_absoluto<LIMIAR && y_absoluto<LIMIAR)
@@ -66,8 +66,6 @@ void verificar_joystick(int16_t x, int16_t y) {
         //Nada a ser feito
     }
      
-    
-    
     
     //Chuva: vento: green, chuva: blue, sol: red
     switch (direcao) {
