@@ -18,11 +18,20 @@
 #define LIMIAR 150
 
 
+display myDisplay;
 
+const char* bool_to_string(bool value) {
+    return value ? "true" : "false";
+}
 
-// int16_t intensidade_chuva = 0;
-// int16_t intensidade_chuva = 0;
-// int16_t intensidade_chuva = 0;
+void print_display(bool sol, bool chuva, bool vento) {
+    display_clear(&myDisplay);
+    display_draw_string(10, 20, sol ? "Sol: true" : "Sol: false", true, &myDisplay);
+    display_draw_string(10, 30, chuva ? "Chuva: true" : "Chuva: false", true, &myDisplay);
+    display_draw_string(10, 40, vento ? "Vento: true" : "Vento: false", true, &myDisplay);
+    display_update(&myDisplay);
+}
+
 
 
 
@@ -74,14 +83,19 @@ void verificar_joystick(int16_t x, int16_t y) {
             led_intensity(LED_BLUE,0);
             led_intensity(LED_RED,0);
             printf("Caso -1\n");
+            display_clear(&myDisplay);
+            display_update(&myDisplay);
             
             break;
         case 0:
+            
             led_intensity(LED_GREEN,0);
             led_intensity(LED_BLUE,0);
             led_intensity(LED_RED,0);
             printf("Caso 0: Norte\n");
+            print_display(sol,chuva,vento);
             break; // Norte
+            
         case 1:
             vento = true;
             led_intensity(LED_GREEN,intensidade);
@@ -89,6 +103,7 @@ void verificar_joystick(int16_t x, int16_t y) {
             led_intensity(LED_RED,0);
             led_intensity(LED_BLUE,0);
             printf("Caso 1: Nordeste\n");
+            print_display(sol,chuva,vento);
             break; // Nordeste
         case 2:
             chuva = true;
@@ -96,6 +111,7 @@ void verificar_joystick(int16_t x, int16_t y) {
             led_intensity(LED_RED,0);
             led_intensity(LED_GREEN,0);
             printf("Caso 2: Leste\n");
+            print_display(sol,chuva,vento);
             break; // Leste
         case 3:
             chuva = true; 
@@ -104,6 +120,7 @@ void verificar_joystick(int16_t x, int16_t y) {
             led_intensity(LED_BLUE,intensidade); 
             led_intensity(LED_RED,0); 
             printf("Caso 3: Sudeste\n");
+            print_display(sol,chuva,vento);
             break; // Sudeste
         case 4:
             sol = true;
@@ -111,9 +128,7 @@ void verificar_joystick(int16_t x, int16_t y) {
             led_intensity(LED_GREEN,0); 
             led_intensity(LED_BLUE,0);
             printf("Caso 4: Sul\n");
-            LOG(intensidade);
-            LOG(x);
-            LOG(y); 
+            print_display(sol,chuva,vento);
             break; // Sul
         case 5:
             sol = true;
@@ -122,6 +137,7 @@ void verificar_joystick(int16_t x, int16_t y) {
             led_intensity(LED_GREEN,intensidade);
             led_intensity(LED_BLUE,0);
             printf("Caso 5: Sudeste\n");
+            print_display(sol,chuva,vento);
             break; // Sudoeste
         case 6:
             sol = true;
@@ -130,6 +146,7 @@ void verificar_joystick(int16_t x, int16_t y) {
             led_intensity(LED_BLUE,intensidade);
             led_intensity(LED_GREEN,0);
             printf("Caso 6: Oeste\n");
+            print_display(sol,chuva,vento);
             break; // Oeste
         case 7:
             sol = true; 
@@ -139,6 +156,7 @@ void verificar_joystick(int16_t x, int16_t y) {
             led_intensity(LED_BLUE,intensidade);
             led_intensity(LED_RED,intensidade);
             printf("Caso 7: Noroeste \n");
+            print_display(sol,chuva,vento);
             break; // Noroeste
     }
 }
@@ -156,7 +174,9 @@ int main()
     led_init(LED_BLUE);
     joystick_init(JOYSTICK_X_PIN, JOYSTICK_Y_PIN);
     
-
+    display_init(&myDisplay);
+    display_clear(&myDisplay);
+    display_update(&myDisplay);
     while (true) {
         // Debug utilizando porta serial
         int16_t joystick_x = joystick_read(JOYSTICK_X_PIN, 10, 510);
