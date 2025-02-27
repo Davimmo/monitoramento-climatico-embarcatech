@@ -182,7 +182,7 @@ int main(){
         int16_t joystick_y = joystick_read(JOYSTICK_Y_PIN, 10, 510);
 
         verificar_joystick(joystick_x, joystick_y);
-        sleep_ms(1000);
+        sleep_ms(10);
 
     }
 }
