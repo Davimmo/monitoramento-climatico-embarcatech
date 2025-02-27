@@ -19,7 +19,7 @@
 
 #define LOG(var) printf("%s: %d\n", #var, var);
 #define TEMPO_DEBOUNCE 150
-#define LIMIAR 150
+#define LIMIAR 50
 
 display myDisplay;
 
